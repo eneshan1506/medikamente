@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DoseStatus {
+  pending
+  taken
+  missed
+  snoozed
+}
+
+enum ScheduleType {
+  times_per_day
+  specific_times
+}
+
+model User {
+  id                  String             @id @default(cuid())
+  email               String             @unique
+  passwordHash        String
+  timeZone            String             @default("UTC")
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  medications         Medication[]
+  schedules           MedicationSchedule[]
+  doseRecords         DoseRecord[]
+  pushSubscriptions   PushSubscription[]
+
+  @@index([email])
+}
+
+model Medication {
+  id          String             @id @default(cuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  note        String?
+  dosageText  String
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  schedule    MedicationSchedule?
+  doseRecords DoseRecord[]
+
+  @@index([userId])
+  @@index([userId, isActive])
+}
+
+model MedicationSchedule {
+  id            String       @id @default(cuid())
+  userId        String
+  medicationId  String       @unique
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medication    Medication   @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  scheduleType  ScheduleType
+  timesPerDay   Int?
+  timesJson     String
+  startDate     String?
+  endDate       String?
+  timeZone      String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  doseRecords   DoseRecord[]
+
+  @@index([userId])
+  @@index([medicationId])
+}
+
+model DoseRecord {
+  id            String       @id @default(cuid())
+  userId        String
+  medicationId  String
+  scheduleId    String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medication    Medication   @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  schedule      MedicationSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  scheduledAt   DateTime
+  status        DoseStatus   @default(pending)
+  actedAt       DateTime?
+  snoozedUntil  DateTime?
+  notifiedAt    DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([userId, scheduledAt])
+  @@index([userId, status, scheduledAt])
+  @@index([scheduleId, scheduledAt])
+  @@unique([scheduleId, scheduledAt])
+}
+
+model PushSubscription {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint    String    @unique
+  p256dh      String
+  auth        String
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+}

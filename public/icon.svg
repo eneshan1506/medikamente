@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Medikamente">
+  <rect width="128" height="128" rx="24" fill="#1f6feb"/>
+  <rect x="24" y="54" width="80" height="20" rx="8" fill="#ffffff"/>
+  <rect x="54" y="24" width="20" height="80" rx="8" fill="#ffffff"/>
+</svg>
