@@ -8,7 +8,8 @@ export class ApiError extends Error {
 }
 
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
-  const response = await fetch(`/api${path}`, {
+  const baseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api';
+  const response = await fetch(`${baseUrl}${path}`, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',

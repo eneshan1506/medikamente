@@ -13,6 +13,7 @@ import { startScheduler } from './application/pushScheduler';
 
 const app = express();
 const port = Number(process.env.PORT ?? 8787);
+app.set('trust proxy', 1);
 
 app.use(helmet());
 app.use(

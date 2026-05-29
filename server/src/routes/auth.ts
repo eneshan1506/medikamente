@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import type { CookieOptions } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { loginSchema, registerSchema, timezoneSchema } from '../domain/contracts';
@@ -6,6 +7,19 @@ import { prisma } from '../infrastructure/prisma';
 import { requireAuth, type AuthRequest } from '../middleware/auth';
 
 export const authRouter = Router();
+
+const cookieOptions = (): CookieOptions => {
+  const sameSite = (process.env.COOKIE_SAME_SITE ?? 'lax') as 'lax' | 'strict' | 'none';
+  const secure = (process.env.COOKIE_SECURE ?? (process.env.NODE_ENV === 'production' ? 'true' : 'false')) === 'true';
+  const domain = process.env.COOKIE_DOMAIN;
+  return {
+    httpOnly: true,
+    sameSite,
+    secure,
+    domain: domain || undefined,
+    path: '/'
+  };
+};
 
 const sign = (userId: string): string => {
   const secret = process.env.JWT_SECRET;
@@ -23,7 +37,7 @@ authRouter.post('/register', async (req, res) => {
     data: { email: input.email, passwordHash, timeZone: 'Europe/Berlin' }
   });
 
-  res.cookie('session', sign(user.id), { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' });
+  res.cookie('session', sign(user.id), cookieOptions());
   return res.json({ id: user.id, email: user.email, timeZone: user.timeZone });
 });
 
@@ -35,12 +49,12 @@ authRouter.post('/login', async (req, res) => {
   const valid = await bcrypt.compare(input.password, user.passwordHash);
   if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
-  res.cookie('session', sign(user.id), { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' });
+  res.cookie('session', sign(user.id), cookieOptions());
   return res.json({ id: user.id, email: user.email, timeZone: user.timeZone });
 });
 
 authRouter.post('/logout', (_req, res) => {
-  res.clearCookie('session');
+  res.clearCookie('session', cookieOptions());
   return res.status(204).send();
 });
 
