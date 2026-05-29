@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { MedicationForm, type FormValues } from './components/MedicationForm';
 import { TodayScreen } from './screens/TodayScreen';

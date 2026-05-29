@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveLocalDateTime } from '../server/src/utils/time';
+import { resolveLocalDateTime } from '../lib/server/time';
 
 describe('timezone DST handling', () => {
   it('spring-forward invalid local time resolves forward', () => {

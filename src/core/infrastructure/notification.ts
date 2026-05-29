@@ -8,7 +8,7 @@ export const ensureNotificationPermission = async (): Promise<NotificationPermis
 };
 
 export const subscribePush = async (): Promise<void> => {
-  const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
+  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   if (!vapidPublicKey || !('serviceWorker' in navigator)) return;
 
   const registration = await navigator.serviceWorker.ready;
