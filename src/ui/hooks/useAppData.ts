@@ -3,7 +3,7 @@ import { authService } from '../../core/application/authService';
 import { doseService } from '../../core/application/doseService';
 import { medicationService, type MedicationUpsertInput } from '../../core/application/medicationService';
 import type { DoseRecord, MedicationWithSchedule, User } from '../../core/domain/types';
-import { ensureNotificationPermission, subscribePush } from '../../core/infrastructure/notification';
+import { ensureNotificationPermission, registerServiceWorker, subscribePush } from '../../core/infrastructure/notification';
 import { browserTimeZone } from '../../core/shared/time';
 
 export const useAppData = () => {
@@ -26,6 +26,7 @@ export const useAppData = () => {
 
   const bootstrap = useCallback(async () => {
     try {
+      await registerServiceWorker();
       const me = await authService.me();
       setUser(me);
       if (me.timeZone !== browserTimeZone()) {
@@ -60,6 +61,7 @@ export const useAppData = () => {
 
   const login = async (email: string, password: string, isRegister: boolean) => {
     try {
+      await registerServiceWorker();
       const me = isRegister ? await authService.register({ email, password }) : await authService.login({ email, password });
       setUser(me);
       await loadData();
