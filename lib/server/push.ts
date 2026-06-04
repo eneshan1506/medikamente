@@ -10,7 +10,10 @@ const ensureVapidConfigured = (): boolean => {
   const subject = process.env.VAPID_SUBJECT;
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const privateKey = process.env.VAPID_PRIVATE_KEY;
-  if (!subject || !publicKey || !privateKey) return false;
+  if (!subject || !publicKey || !privateKey) {
+    console.error('[push] VAPID not configured:', { subject: !!subject, publicKey: !!publicKey, privateKey: !!privateKey });
+    return false;
+  }
 
   webpush.setVapidDetails(subject, publicKey, privateKey);
   vapidConfigured = true;
@@ -24,7 +27,10 @@ const shouldNotify = (now: Date, dueAt: Date, notifiedAt: Date | null): boolean 
 };
 
 export const sendDueDoseNotifications = async (): Promise<{ sent: number; failed: number; skipped: number }> => {
-  if (!ensureVapidConfigured()) return { sent: 0, failed: 0, skipped: 0 };
+  if (!ensureVapidConfigured()) {
+    console.error('[push] Aborting: VAPID not configured');
+    return { sent: 0, failed: 0, skipped: 0 };
+  }
 
   const now = new Date();
   const due = await prisma.doseRecord.findMany({
@@ -52,6 +58,7 @@ export const sendDueDoseNotifications = async (): Promise<{ sent: number; failed
 
     const subs = await prisma.pushSubscription.findMany({ where: { userId: dose.userId } });
     if (subs.length === 0) {
+      console.log(`[push] No subscriptions for user ${dose.userId}, skipping dose ${dose.id}`);
       skipped += 1;
       continue;
     }
@@ -72,7 +79,8 @@ export const sendDueDoseNotifications = async (): Promise<{ sent: number; failed
           payload
         );
         sent += 1;
-      } catch {
+      } catch (err) {
+        console.error(`[push] Failed to send to ${sub.endpoint}:`, err);
         failed += 1;
         await prisma.pushSubscription.deleteMany({ where: { endpoint: sub.endpoint, userId: dose.userId } });
       }
