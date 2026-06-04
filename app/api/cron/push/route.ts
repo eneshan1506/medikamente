@@ -4,10 +4,34 @@ import { generateDoseRecordsForToday, refreshMissed } from '../../../../lib/serv
 import { sendDueDoseNotifications } from '../../../../lib/server/push';
 
 const isAuthorized = (request: Request): boolean => {
-  if (request.headers.get('x-vercel-cron') === '1') return true;
+  if (request.headers.get('x-vercel-cron') === '1') {
+    console.log('[cron/push] Authorized via Vercel system cron header.');
+    return true;
+  }
+  
   const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  return request.headers.get('authorization') === `Bearer ${secret}`;
+  const authHeader = request.headers.get('authorization');
+
+  if (!secret) {
+    console.error('[cron/push] Authorization failed: CRON_SECRET environment variable is missing on Vercel!');
+    return false;
+  }
+
+  const expectedHeader = `Bearer ${secret}`;
+  const matches = authHeader === expectedHeader;
+
+  if (!matches) {
+    console.error('[cron/push] Authorization failed: Header mismatch.', {
+      receivedHeaderExists: !!authHeader,
+      receivedHeaderLength: authHeader?.length || 0,
+      receivedHeaderStart: authHeader ? authHeader.substring(0, 15) + '...' : 'none',
+      expectedSecretLength: secret.length
+    });
+  } else {
+    console.log('[cron/push] Authorized via custom Authorization header.');
+  }
+
+  return matches;
 };
 
 export async function GET(request: Request) {
