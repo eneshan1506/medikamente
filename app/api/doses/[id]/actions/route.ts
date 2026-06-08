@@ -18,7 +18,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
   }
 
   const base = dose.snoozedUntil ?? dose.scheduledAt;
-  const next = new Date(Math.max(Date.now(), base.getTime()) + 10 * 60 * 1000);
+  const next = new Date(Math.max(Date.now(), base.getTime()) + 45 * 60 * 1000);
   const updated = await prisma.doseRecord.update({ where: { id: dose.id }, data: { status: DoseStatus.snoozed, snoozedUntil: next, notifiedAt: null } });
   return NextResponse.json(updated);
 }

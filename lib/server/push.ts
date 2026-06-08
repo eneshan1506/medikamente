@@ -1,7 +1,7 @@
 import webpush from 'web-push';
 import { prisma } from './prisma';
 
-const REPEAT_INTERVAL_MS = 10 * 60 * 1000;
+const REPEAT_INTERVAL_MS = 45 * 60 * 1000;
 
 let vapidConfigured = false;
 

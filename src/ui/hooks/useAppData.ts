@@ -49,7 +49,7 @@ export const useAppData = () => {
 
   useEffect(() => {
     const onMessage = async (event: MessageEvent) => {
-      const action = event.data?.action as 'taken' | 'snooze_10' | undefined;
+      const action = event.data?.action as 'taken' | 'snooze_45' | undefined;
       const doseId = event.data?.doseId as string | undefined;
       if (!action || !doseId) return;
       await doseService.action(doseId, action);
@@ -97,7 +97,7 @@ export const useAppData = () => {
   };
 
   const snoozeDose = async (doseId: string) => {
-    await doseService.action(doseId, 'snooze_10');
+    await doseService.action(doseId, 'snooze_45');
     await refresh();
   };
 

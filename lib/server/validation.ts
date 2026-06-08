@@ -31,4 +31,4 @@ export const medicationSchema = z
 
 export const timezoneSchema = z.object({ timeZone: z.string().min(1) });
 export const pushSchema = z.object({ endpoint: z.string().url(), keys: z.object({ p256dh: z.string().min(1), auth: z.string().min(1) }) });
-export const doseActionSchema = z.object({ action: z.enum(['taken', 'snooze_10']) });
+export const doseActionSchema = z.object({ action: z.enum(['taken', 'snooze_45']) });

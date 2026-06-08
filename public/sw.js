@@ -8,7 +8,7 @@ self.addEventListener('push', (event) => {
     data: { doseId: payload.doseId || null },
     actions: [
       { action: 'taken', title: 'Aldim' },
-      { action: 'snooze_10', title: '10 dk ertele' }
+      { action: 'snooze_45', title: '45 dk ertele' }
     ]
   };
   event.waitUntil(self.registration.showNotification(title, options));

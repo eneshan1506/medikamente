@@ -26,7 +26,7 @@ export const TodayScreen = ({ agenda, onTaken, onSnooze }: Props) => (
             <button onClick={() => onTaken(item.id)} disabled={item.status === 'taken'}>
               Aldım
             </button>
-            <button onClick={() => onSnooze(item.id)}>10 dk ertele</button>
+            <button onClick={() => onSnooze(item.id)}>45 dk ertele</button>
           </div>
         </li>
       ))}

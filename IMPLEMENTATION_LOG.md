@@ -79,7 +79,7 @@ Klasör yapısı:
 - Günlük doz üretimi (`generateTodayDoses`)
 - Günlük ajanda çekme (`getTodayAgenda`)
 - Doz alma (`markTaken`)
-- Erteleme (`snoozeDose`, 10 dk)
+- Erteleme (`snoozeDose`, 45 dk)
 - Kaçırılanları işaretleme (`refreshMissedStatuses`)
 - Bildirim zamanı gelenleri bulma (`dueForNotification`)
 
@@ -89,7 +89,7 @@ Klasör yapısı:
 - Service Worker notification click action handling eklendi.
 - Notification aksiyonları:
   - `Aldım`
-  - `10 dk ertele`
+  - `45 dk ertele`
 - SW -> UI `postMessage` ile aksiyonlar işlendi.
 
 ## 6) UI/UX Geliştirmeleri
@@ -160,4 +160,3 @@ Kullanıcı geri bildirimlerine göre yapılan son düzenlemeler:
 
 - Her büyük adım sonrası `pnpm build` çalıştırıldı.
 - Son durumda build başarılı.
-
